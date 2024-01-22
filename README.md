@@ -12,7 +12,7 @@ A bash script to easily set, unset, and manage proxy settings in your environmen
     - [Config File](#config-file)
     - [Bash Completion](#bash-completion)
     - [Zsh Completion](#zsh-completion)
-  - [Example](#example)
+  - [Examples](#examples)
   - [Contributing](#contributing)
   - [License](#license)
 
@@ -27,25 +27,45 @@ proxy [command]
 - **on**: Set the proxy environment variables.
 - **off**: Unset the proxy environment variables.
 - **status**: Print the current proxy status.
-- **show**: Display the current proxy environment variables.
-- **configuration**: Launch the configuration wizard.
-- **completion**: Generate a completion script for bash or zsh.
+- **configure**: Starts the configuration wizard.
+- **completion**: Generate a completion script for `bash` or `zsh`.
 - **help**: Display the help message.
 
 ## Setup
 
+The `proxy.sh` script is designed to modify the environment variables of your current shell session, specifically to set or unset proxy settings. To achieve this, the script needs to be executed within the context of the current shell, not as a separate subprocess. This is where sourcing the script (using `source` or `.`) becomes essential.
+
 ### Config File
 
-To configure the proxy, create a `proxy.conf` file in your `$HOME` directory or specify its location using the `PROXY_SWITCHER_CONFIG` environment variable.
+To configure the proxy, create a `.proxy.conf` file in your `$HOME` directory or specify its location using the `PROXY_SWITCHER_CONFIG` environment variable.
 
-The configuration should contain the following two variables:
+The configuration must contain the following two variables:
 
 ```text
 HTTP_PROXY=http://proxy.company.com:PORT
 HTTPS_PROXY=http://proxy.company.com:PORT
 ```
 
-As an alternative, run the script with the `configuration` command and follow the on-screen instructions.
+### Alias
+
+Create a alias in your `.bashrc` or `.zshrc` file:
+
+#### Bash
+
+```bash
+function proxy_script() {
+    source /path/to/proxy.sh "\$@"
+}
+alias proxy=proxy_script
+```
+
+#### Zsh
+
+```sh
+function proxy() {
+    source /path/to/proxy.sh "\$@"
+}
+```
 
 ### Bash Completion
 
@@ -63,7 +83,7 @@ For Zsh auto-completion, run:
 . <(proxy completion zsh) && compdef _proxy proxy
 ```
 
-## Example
+## Examples
 
 ```bash
 # Set the proxy:
@@ -75,8 +95,11 @@ proxy off
 # Check the proxy status:
 proxy status
 
-# Launch the configuration wizard:
-proxy configuration
+# Show completion for bash:
+proxy completion bash
+
+# Show completion for zsh:
+proxy completion zsh
 ```
 
 ## Contributing
