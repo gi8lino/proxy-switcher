@@ -27,6 +27,7 @@ proxy [command]
 - **on**: Set the proxy environment variables.
 - **off**: Unset the proxy environment variables.
 - **status**: Print the current proxy status.
+- **show**: Display the current proxy environment variables.
 - **configure**: Starts the configuration wizard.
 - **completion**: Generate a completion script for `bash` or `zsh`.
 - **help**: Display the help message.
@@ -94,6 +95,9 @@ proxy off
 
 # Check the proxy status:
 proxy status
+
+# Show the current proxy settings:
+proxy show
 
 # Show completion for bash:
 proxy completion bash
