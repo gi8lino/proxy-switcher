@@ -55,7 +55,7 @@ Create a alias in your `.bashrc` or `.zshrc` file:
 
 ```bash
 function proxy_script() {
-    source /path/to/proxy.sh "\$@"
+    source /path/to/proxy.sh "$@"
 }
 alias proxy=proxy_script
 ```
@@ -64,7 +64,7 @@ alias proxy=proxy_script
 
 ```sh
 function proxy() {
-    source /path/to/proxy.sh "\$@"
+    source /path/to/proxy.sh "$@"
 }
 ```
 
