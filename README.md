@@ -81,7 +81,7 @@ source <(proxy completion bash)
 For Zsh auto-completion, run:
 
 ```bash
-. <(proxy completion zsh) && compdef _proxy proxy
+.. <(proxy completion zsh) && compdef _proxy proxy
 ```
 
 ## Examples

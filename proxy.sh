@@ -1,68 +1,84 @@
 #!/bin/bash
 
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+NORMAL=$(tput sgr0)
+
+# Function to log an error message
+log_error() {
+	local err="$1"
+	printf "${RED}ERROR:${NORMAL} %s\n" "$err" >&2
+}
+
 if ! (return 0 2>/dev/null); then
-	printf "\e[31mERROR:\e[0m This script should be sourced, not executed directly.\n"
-	exit 1
+	log_error "This script should be sourced, not executed directly."
+	return
 fi
 
-# Configuration file path
 config_file="${PROXY_SWITCHER_CONFIG:-$HOME}/.proxy.config"
 
 # Function to extract a proxy setting from the configuration file
-extract_proxy() {
+extract_var() {
 	local key="$1"
-	local result=$(sed -n -e "s/^${key}=\(.*\)$/\1/p" "${config_file}")
+	local result
 
-	printf "$result"
+	if ! result=$(sed -n -e "s/^.*${key}=\(.*\)$/\1/p" "${config_file}"); then
+		log_error "cannot process config file"
+		return 1
+	fi
+
+	printf "%s" "$result"
 }
 
 # Function to set the proxy
 set_proxy() {
-	local http_proxy=$(extract_proxy 'HTTP_PROXY')
-	if [ -z "$http_proxy" ]; then
-		printf "\e[31mERROR:\e[0m HTTP Proxy not found in configuration file\n"
+	local http_proxy https_proxy
+
+	if ! http_proxy=$(extract_var 'HTTP_PROXY') || [ -z "$http_proxy" ]; then
+		log_error "HTTP Proxy not found in configuration file"
+
 		return 1
 	fi
 
-	local https_proxy=$(extract_proxy 'HTTPS_PROXY')
-	if [ -z "$https_proxy" ]; then
-		printf "\e[31mERROR:\e[0m HTTPS Proxy not found in configuration file\n"
+	if ! https_proxy=$(extract_var 'HTTPS_PROXY') || [ -z "$https_proxy" ]; then
+		log_error "HTTPS Proxy not found in configuration file"
 		return 1
 	fi
 
 	export HTTP_PROXY="$http_proxy"
 	export HTTPS_PROXY="$https_proxy"
 
-	printf "Switched proxy to \e[31mON\e[0m\n"
+	printf "Switched proxy to %sON%s\n" "${RED}" "${NORMAL}"
 }
 
 # Function to unset the proxy
 unset_proxy() {
 	unset HTTP_PROXY HTTPS_PROXY
-	printf "Switched proxy to \e[32mOFF\e[0m\n"
+
+	printf "Switched proxy to %sOFF$%s\n" "${GREEN}" "${NORMAL}"
 }
 
 # Function to display the current proxy status
 show_status() {
 	if [ -z "$HTTP_PROXY" ]; then
-		printf "HTTP Proxy is \e[32mOFF\e[0m\n"
+		printf "HTTP Proxy is %sOFF%s\n" "${GREEN}" "${NORMAL}"
 	else
-		printf "HTTP Proxy is \e[31mON\e[0m\n"
+		printf "HTTP Proxy is %sON%s\n" "${RED}" "${NORMAL}"
 	fi
 
 	if [ -z "$HTTPS_PROXY" ]; then
-		printf "HTTPS roxy is \e[32mOFF\e[0m\n"
+		printf "HTTPS Proxy is %sOFF%s\n" "${GREEN}" "${NORMAL}"
 	else
-		printf "HTTPS Proxy is \e[31mON\e[0m\n"
+		printf "HTTPS Proxy is %sON%s\n" "${RED}" "${NORMAL}"
 	fi
-
 }
 
 # Function to display the current proxy settings
 show_proxy() {
-	http_proxy=$(extract_proxy 'HTTP_PROXY')
+	http_proxy=$(extract_var 'HTTP_PROXY')
+	https_proxy=$(extract_var 'HTTPS_PROXY')
+
 	printf "HTTP Proxy is: %s\n" "${http_proxy:-'not configured'}"
-	https_proxy=$(extract_proxy 'HTTPS_PROXY')
 	printf "HTTPS Proxy is: %s\n" "${https_proxy:-'not configured'}"
 }
 
@@ -70,19 +86,16 @@ show_proxy() {
 configure_proxy() {
 	local new_http_proxy new_https_proxy input
 
-	# Check if the config file already exists
 	if [ -f "${config_file}" ]; then
-		# HTTP Proxy
-		new_http_proxy=$(extract_proxy 'HTTP_PROXY')
-		printf "Current HTTP Proxy is '${new_http_proxy}'. Enter new HTTP Proxy (leave blank to keep current): "
+		new_http_proxy=$(extract_var 'HTTP_PROXY')
+		printf "Current HTTP Proxy is '%s'. Enter new HTTP Proxy (leave blank to keep current): " "${new_http_proxy}"
 		read -r input
 		if [ -n "$input" ]; then
 			new_http_proxy=$input
 		fi
 
-		# HTTPS Proxy
-		new_https_proxy=$(extract_proxy 'HTTPS_PROXY')
-		printf "Current HTTPS Proxy is '${new_https_proxy}'. Enter new HTTPS Proxy (leave blank to keep current): "
+		new_https_proxy=$(extract_var 'HTTPS_PROXY')
+		printf "Current HTTPS Proxy is '%s'. Enter new HTTPS Proxy (leave blank to keep current): " "${new_https_proxy}"
 		read -r input
 		if [ -n "$input" ]; then
 			new_https_proxy=$input
@@ -94,7 +107,6 @@ configure_proxy() {
 		read -r new_https_proxy
 	fi
 
-	# Write to config file
 	echo "HTTP_PROXY=${new_http_proxy}" >"${config_file}"
 	echo "HTTPS_PROXY=${new_https_proxy}" >>"${config_file}"
 
@@ -172,9 +184,8 @@ EOF
 # Main logic to process the command
 case "$1" in
 on)
-	# Check for the existence of the configuration file
 	if [ ! -f "${config_file}" ]; then
-		echo "Configuration file not found. Please run \"proxy configure\" first."
+		log_error "Configuration file not found. Please run \"proxy configure\" first."
 		return
 	fi
 
@@ -206,6 +217,6 @@ help)
 	show_help
 	;;
 *)
-	printf "\e[31mERROR:\e[0m unknown command '$1'\nUsage: source $0 {on|off|status|show|configure|completion|help}\n"
+	log_error "unknown command '$1'\nUsage: source $0 {on|off|status|show|configure|completion|help}"
 	;;
 esac
