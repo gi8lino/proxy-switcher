@@ -38,7 +38,7 @@ The `proxy.sh` script is designed to modify the environment variables of your cu
 
 ### Config File
 
-To configure the proxy, create a `.proxy.conf` file in your `$HOME` directory or specify its location using the `PROXY_SWITCHER_CONFIG` environment variable.
+To configure the proxy, create a `.proxy_conf` file in your `$HOME` directory or specify its location using the `PROXY_SWITCHER_CONFIG` environment variable.
 
 The configuration must contain the following two variables:
 

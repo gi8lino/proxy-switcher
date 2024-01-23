@@ -15,7 +15,7 @@ if ! (return 0 2>/dev/null); then
 	return
 fi
 
-config_file="${PROXY_SWITCHER_CONFIG:-$HOME}/.proxy.config"
+config_file="${PROXY_SWITCHER_CONFIG:-$HOME}/.proxy_config"
 
 # Function to extract a proxy setting from the configuration file
 extract_var() {
