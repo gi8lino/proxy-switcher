@@ -55,7 +55,7 @@ set_proxy() {
 unset_proxy() {
 	unset HTTP_PROXY HTTPS_PROXY
 
-	printf "Switched proxy to %sOFF$%s\n" "${GREEN}" "${NORMAL}"
+	printf "Switched proxy to %sOFF%s\n" "${GREEN}" "${NORMAL}"
 }
 
 # Function to display the current proxy status
