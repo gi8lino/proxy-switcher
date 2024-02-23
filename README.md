@@ -1,6 +1,7 @@
 # Proxy Switcher Script
 
 A bash script to easily set, unset, and manage proxy settings in your environment.
+The `proxy.sh` script is designed to modify the environment variables of your current shell session, specifically to set or unset proxy settings. To achieve this, the script needs to be executed within the context of the current shell, not as a separate subprocess. This is where sourcing the script (using `source` or `.`) becomes essential.
 
 ## Table of Contents
 
@@ -34,7 +35,7 @@ proxy [command]
 
 ## Setup
 
-The `proxy.sh` script is designed to modify the environment variables of your current shell session, specifically to set or unset proxy settings. To achieve this, the script needs to be executed within the context of the current shell, not as a separate subprocess. This is where sourcing the script (using `source` or `.`) becomes essential.
+Run `proxy configure` to start the configuration wizard.
 
 ### Config File
 
@@ -92,6 +93,9 @@ proxy on
 
 # Unset the proxy:
 proxy off
+
+# Run the configuration wizard:
+proxy configure
 
 # Check the proxy status:
 proxy status
